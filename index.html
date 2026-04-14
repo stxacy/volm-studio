@@ -420,6 +420,149 @@
     }
 
     /* ============================================
+       SCROLL STORY
+    ============================================ */
+    .scroll-story {
+      height: 300vh;
+      position: relative;
+    }
+
+    .scroll-story-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .story-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: 0;
+    }
+
+    .story-scrim {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        linear-gradient(to right, rgba(14,11,9,0.85) 0%, rgba(14,11,9,0.55) 32%, rgba(14,11,9,0.08) 58%, transparent 72%),
+        linear-gradient(to bottom, rgba(14,11,9,0.35) 0%, transparent 22%, transparent 75%, rgba(14,11,9,0.5) 100%);
+    }
+
+    .story-panel {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 4.5rem;
+      z-index: 2;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .story-panel-inner {
+      max-width: 500px;
+    }
+
+    .story-kicker {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      color: var(--accent-warm);
+      margin-bottom: 1.75rem;
+    }
+
+    .story-heading {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(3rem, 5vw, 5.75rem);
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      color: var(--white);
+      margin-bottom: 2rem;
+    }
+
+    .story-heading em {
+      font-style: italic;
+      color: var(--accent-warm);
+    }
+
+    .story-body {
+      font-size: 1rem;
+      font-weight: 300;
+      line-height: 1.75;
+      color: rgba(253, 252, 250, 0.65);
+      max-width: 38ch;
+    }
+
+    .story-progress {
+      position: absolute;
+      right: 3rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      gap: 0.875rem;
+      align-items: center;
+    }
+
+    .story-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(253, 252, 250, 0.22);
+      transition: background 0.4s ease, transform 0.4s ease;
+    }
+
+    .story-dot.active {
+      background: var(--accent-warm);
+      transform: scale(1.5);
+    }
+
+    .story-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      width: 0%;
+      background: var(--accent-warm);
+      z-index: 3;
+      transition: width 0.05s linear;
+    }
+
+    @media (max-width: 768px) {
+      .scroll-story {
+        height: 350vh;
+      }
+
+      .story-panel {
+        padding: 0 1.5rem;
+        align-items: flex-end;
+        padding-bottom: 5.5rem;
+      }
+
+      .story-scrim {
+        background:
+          linear-gradient(to top, rgba(14,11,9,0.88) 0%, rgba(14,11,9,0.5) 45%, transparent 70%),
+          linear-gradient(to bottom, rgba(14,11,9,0.4) 0%, transparent 30%);
+      }
+
+      .story-progress {
+        right: 1.25rem;
+        top: auto;
+        bottom: 2.5rem;
+        transform: none;
+        flex-direction: row;
+      }
+    }
+
+    /* ============================================
        MARQUEE STRIP
     ============================================ */
     .marquee-strip {
@@ -1272,6 +1415,47 @@
     </div>
   </section>
 
+  <!-- ==================== SCROLL STORY ==================== -->
+  <section class="scroll-story" id="scrollStory">
+    <div class="scroll-story-sticky">
+      <video class="story-video" id="storyVideo" muted playsinline preload="auto">
+        <source src="interior_design_house.mp4" type="video/mp4">
+      </video>
+      <div class="story-scrim"></div>
+
+      <div class="story-panel" id="storyPanel0">
+        <div class="story-panel-inner">
+          <p class="story-kicker">— 01 / Spatial Thinking</p>
+          <h2 class="story-heading">Every room<br>tells a<br><em>story.</em></h2>
+          <p class="story-body">We begin with proportion and light — understanding how a space breathes before a single object is placed.</p>
+        </div>
+      </div>
+
+      <div class="story-panel" id="storyPanel1">
+        <div class="story-panel-inner">
+          <p class="story-kicker">— 02 / Material Craft</p>
+          <h2 class="story-heading">Surface<br>meets<br><em>soul.</em></h2>
+          <p class="story-body">Every texture is chosen for how it ages. Stone, timber, plaster — materials that deepen in character over time.</p>
+        </div>
+      </div>
+
+      <div class="story-panel" id="storyPanel2">
+        <div class="story-panel-inner">
+          <p class="story-kicker">— 03 / Considered Detail</p>
+          <h2 class="story-heading">Detail<br>is the<br><em>design.</em></h2>
+          <p class="story-body">The junction of a threshold, the reveal of a shelf, the shadow of a cornice — this is where architecture becomes art.</p>
+        </div>
+      </div>
+
+      <div class="story-progress">
+        <div class="story-dot active" data-index="0"></div>
+        <div class="story-dot" data-index="1"></div>
+        <div class="story-dot" data-index="2"></div>
+      </div>
+      <div class="story-bar" id="storyBar"></div>
+    </div>
+  </section>
+
   <!-- ==================== MARQUEE ==================== -->
   <div class="marquee-strip" aria-hidden="true">
     <div class="marquee-track">
@@ -1693,6 +1877,65 @@
         item.style.transition = 'padding 0.35s cubic-bezier(0.16, 1, 0.3, 1), margin 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
       });
     });
+
+    // Scroll story — frame-by-frame video scrub + panel crossfade
+    (function () {
+      const section   = document.getElementById('scrollStory');
+      const video     = document.getElementById('storyVideo');
+      const panels    = Array.from(document.querySelectorAll('.story-panel'));
+      const dots      = Array.from(document.querySelectorAll('.story-dot'));
+      const bar       = document.getElementById('storyBar');
+      if (!section || !video) return;
+
+      const PANEL_COUNT = panels.length;
+      const FADE = 0.22; // fraction of each panel's range used for fade in/out
+
+      function tick() {
+        const sectionTop    = section.getBoundingClientRect().top + window.scrollY;
+        const scrollTravel  = section.offsetHeight - window.innerHeight;
+        const scrolled      = window.scrollY - sectionTop;
+        const progress      = Math.max(0, Math.min(1, scrolled / scrollTravel));
+
+        // Scrub video frame-by-frame
+        if (video.readyState >= 2 && video.duration) {
+          video.currentTime = progress * video.duration;
+        }
+
+        // Progress bar
+        bar.style.width = (progress * 100) + '%';
+
+        // Panel opacity: each panel owns 1/PANEL_COUNT of the scroll range
+        panels.forEach((panel, i) => {
+          const start = i / PANEL_COUNT;
+          const end   = (i + 1) / PANEL_COUNT;
+
+          if (progress < start || progress > end) {
+            // outside this panel's window — keep last panel visible at tail
+            panel.style.opacity = (i === PANEL_COUNT - 1 && progress >= 1) ? 1 : 0;
+            return;
+          }
+
+          const rel = (progress - start) / (end - start); // 0→1 within this panel
+          let opacity;
+          if (rel < FADE) {
+            opacity = rel / FADE;                          // fade in
+          } else if (rel > 1 - FADE && i < PANEL_COUNT - 1) {
+            opacity = (1 - rel) / FADE;                   // fade out (not last)
+          } else {
+            opacity = 1;
+          }
+          panel.style.opacity = opacity;
+        });
+
+        // Active dot
+        const activeIdx = Math.min(PANEL_COUNT - 1, Math.floor(progress * PANEL_COUNT));
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === activeIdx));
+      }
+
+      window.addEventListener('scroll', tick, { passive: true });
+      video.addEventListener('loadedmetadata', tick);
+      tick(); // run once on load in case already scrolled
+    })();
   </script>
 
 </body>
