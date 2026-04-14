@@ -343,7 +343,7 @@
       pointer-events: none;
       background:
         linear-gradient(to right,  var(--bg) 0%, transparent 24%, transparent 76%, var(--bg) 100%),
-        linear-gradient(to bottom, rgba(246,243,238,0.75) 0%, transparent 22%, transparent 68%, var(--bg) 100%),
+        linear-gradient(to bottom, rgba(246,243,238,0.98) 0%, rgba(246,243,238,0.6) 12%, transparent 30%, transparent 52%, rgba(246,243,238,0.7) 78%, var(--bg) 92%),
         radial-gradient(ellipse 70% 60% at 50% 50%, rgba(28,24,21,0.28) 0%, transparent 70%);
     }
 
@@ -442,6 +442,8 @@
       object-fit: cover;
       object-position: center;
       z-index: 0;
+      transform: translateZ(0);
+      will-change: transform;
     }
 
     .story-scrim {
@@ -451,7 +453,7 @@
       pointer-events: none;
       background:
         linear-gradient(to right, rgba(14,11,9,0.85) 0%, rgba(14,11,9,0.55) 32%, rgba(14,11,9,0.08) 58%, transparent 72%),
-        linear-gradient(to bottom, rgba(14,11,9,0.35) 0%, transparent 22%, transparent 75%, rgba(14,11,9,0.5) 100%);
+        linear-gradient(to bottom, rgba(14,11,9,0.85) 0%, rgba(14,11,9,0.5) 12%, transparent 28%, transparent 68%, rgba(14,11,9,0.65) 88%, rgba(14,11,9,0.9) 100%);
     }
 
     .story-panel {
@@ -1837,15 +1839,21 @@
     // Magnetic button effect on primary CTAs
     const magneticEls = document.querySelectorAll('.btn-primary, .nav-cta');
     magneticEls.forEach(el => {
+      let magRaf = null;
+      let magX = 0, magY = 0;
       el.addEventListener('mousemove', (e) => {
         const rect = el.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = (e.clientX - cx) * 0.25;
-        const dy = (e.clientY - cy) * 0.25;
-        el.style.transform = `translate(${dx}px, ${dy}px)`;
+        magX = (e.clientX - rect.left - rect.width / 2) * 0.25;
+        magY = (e.clientY - rect.top - rect.height / 2) * 0.25;
+        if (!magRaf) {
+          magRaf = requestAnimationFrame(() => {
+            el.style.transform = `translate(${magX}px, ${magY}px)`;
+            magRaf = null;
+          });
+        }
       });
       el.addEventListener('mouseleave', () => {
+        if (magRaf) { cancelAnimationFrame(magRaf); magRaf = null; }
         el.style.transform = '';
         el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.35s, color 0.35s, border-color 0.35s';
       });
@@ -1857,14 +1865,22 @@
     // Work card — parallax tilt on hover
     const workCards = document.querySelectorAll('.work-card');
     workCards.forEach(card => {
+      let cardRaf = null;
+      let cardX = 0, cardY = 0;
       card.addEventListener('mousemove', (e) => {
         const rect = card.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-        card.style.transform = `perspective(800px) rotateY(${x * 4}deg) rotateX(${-y * 4}deg)`;
-        card.style.transition = 'transform 0.1s ease';
+        cardX = (e.clientX - rect.left) / rect.width - 0.5;
+        cardY = (e.clientY - rect.top) / rect.height - 0.5;
+        if (!cardRaf) {
+          cardRaf = requestAnimationFrame(() => {
+            card.style.transform = `perspective(800px) rotateY(${cardX * 4}deg) rotateX(${-cardY * 4}deg)`;
+            card.style.transition = 'transform 0.1s ease';
+            cardRaf = null;
+          });
+        }
       });
       card.addEventListener('mouseleave', () => {
+        if (cardRaf) { cancelAnimationFrame(cardRaf); cardRaf = null; }
         card.style.transform = '';
         card.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
       });
@@ -1890,11 +1906,17 @@
       const PANEL_COUNT = panels.length;
       const FADE = 0.22; // fraction of each panel's range used for fade in/out
 
+      // Cache layout values — reflow is expensive on every scroll tick
+      let sectionTop   = section.offsetTop;
+      let scrollTravel = section.offsetHeight - window.innerHeight;
+      window.addEventListener('resize', () => {
+        sectionTop   = section.offsetTop;
+        scrollTravel = section.offsetHeight - window.innerHeight;
+      }, { passive: true });
+
       function tick() {
-        const sectionTop    = section.getBoundingClientRect().top + window.scrollY;
-        const scrollTravel  = section.offsetHeight - window.innerHeight;
-        const scrolled      = window.scrollY - sectionTop;
-        const progress      = Math.max(0, Math.min(1, scrolled / scrollTravel));
+        const scrolled  = window.scrollY - sectionTop;
+        const progress  = Math.max(0, Math.min(1, scrolled / scrollTravel));
 
         // Scrub video frame-by-frame
         if (video.readyState >= 2 && video.duration) {
@@ -1932,7 +1954,15 @@
         dots.forEach((dot, i) => dot.classList.toggle('active', i === activeIdx));
       }
 
-      window.addEventListener('scroll', tick, { passive: true });
+      let scrollRaf = null;
+      window.addEventListener('scroll', () => {
+        if (!scrollRaf) {
+          scrollRaf = requestAnimationFrame(() => {
+            tick();
+            scrollRaf = null;
+          });
+        }
+      }, { passive: true });
       video.addEventListener('loadedmetadata', tick);
       tick(); // run once on load in case already scrolled
     })();
